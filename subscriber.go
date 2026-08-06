@@ -11,7 +11,13 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
-	"syscall"
+)
+
+const (
+	afInet         = 2
+	afInet6Linux   = 10
+	afInet6Windows = 23
+	afInet6Darwin  = 30
 )
 
 type Subscription struct {
@@ -172,9 +178,9 @@ func (s *Subscription) connAuxRequest() (int32, string, error) {
 
 	var addr netip.Addr
 	switch family {
-	case syscall.AF_INET:
+	case afInet:
 		addr = netip.AddrFrom4([4]byte(buf[4:8]))
-	case syscall.AF_INET6:
+	case afInet6Linux, afInet6Windows, afInet6Darwin:
 		if reflect.DeepEqual(buf[4:20], []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff}) {
 			addr = netip.AddrFrom4([4]byte(buf[20:24]))
 		} else {
