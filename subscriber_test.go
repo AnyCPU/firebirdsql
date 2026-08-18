@@ -4,7 +4,6 @@ package firebirdsql
 
 import (
 	"strings"
-	"syscall"
 	"testing"
 )
 
@@ -22,7 +21,7 @@ func newTestSubscription(frame []byte) *Subscription {
 
 func sockAddrIPv4(port int, a, b, c, d byte) []byte {
 	return []byte{
-		byte(syscall.AF_INET & 0xFF), byte(syscall.AF_INET >> 8),
+		byte(afInet & 0xFF), byte(afInet >> 8),
 		byte(port >> 8), byte(port & 0xFF), // port, big-endian
 		a, b, c, d, // address
 		0, 0, 0, 0, 0, 0, 0, 0, // sockaddr_in padding
@@ -52,7 +51,7 @@ func TestConnAuxRequest_TruncatedBuffers(t *testing.T) {
 		{"empty", nil, "too short"},
 		{"header only", []byte{2, 0, 0x0B, 0xEB}, "IPv4 address truncated"},
 		{"ipv6 truncated", append([]byte{
-			byte(syscall.AF_INET6 & 0xFF), byte(syscall.AF_INET6 >> 8), 0x0B, 0xEB,
+			byte(afInet6Linux & 0xFF), byte(afInet6Linux >> 8), 0x0B, 0xEB,
 		}, make([]byte, 8)...), "IPv6 address truncated"},
 	}
 	for _, tt := range cases {
